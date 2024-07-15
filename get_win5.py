@@ -3,7 +3,7 @@ import datetime
 import json
 from bs4 import BeautifulSoup
 from urllib import request
-RESULT_OUTPUT_PATH = './result.json'
+RESULT_OUTPUT_PATH = './win5_result.json'
 
 def main():
     this_year = datetime.datetime.now().year
@@ -13,6 +13,7 @@ def main():
     response = request.urlopen(win5_url)
     htmlsource = BeautifulSoup(response, 'html.parser')
     win5s = htmlsource.find_all(class_='WIN5_RaceListBox')
+    win5s.reverse()
     res_list = []
     for win5 in win5s:
         # print(win5)
@@ -64,7 +65,7 @@ def main():
             # print('{},{},{},{}'.format(win5_date, win5_title, win5_number,win5_ninki))
 
     res_dict = {"win5_data_list": res_list}
-    json.dumps(res_dict)
+    # json.dumps(res_dict)
     with open(RESULT_OUTPUT_PATH, 'w') as json_file:
         json.dump(res_dict, json_file)
     print('Get win5 data done')
