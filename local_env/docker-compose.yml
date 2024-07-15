@@ -1,0 +1,10 @@
+version: '3.4'
+services:
+  python-app:
+    build: 
+      context: ./python
+      dockerfile: ./Dockerfile
+    image: "suguru/python3"
+  mysql-db:
+  image: mysql:7.2
+  
