@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 def main():
@@ -63,7 +62,7 @@ def main():
         )
     )
     # fig.update_yaxes(type='log')
-    fig.show()
+    # fig.show()
     output_path = './fig/win5_return_odds_sum.json'
     # fig.write_html("./win5_jockey_win.html", full_html=False,include_plotlyjs=False)
     fig.write_json(output_path)
