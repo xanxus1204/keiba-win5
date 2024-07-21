@@ -11,17 +11,13 @@ def main():
         result_detail_json = json.load(jsonf)
       
     populuar_sum = []
-    odds_sum = []
     jockey_win_nums = defaultdict(int)
     for data in result_json['win5_data_list']:
         print('Start target win5 ' + data['win5_id'])
         win5_detail_dict = result_detail_json['win5_data_race_detail']
-        odds_5race_sum = 0
         for race_num in range(1,6): 
             target_data = next((item for item in win5_detail_dict if item["race_id"] == data['win{}_race_id'.format(race_num)]), None)
             jockey_win_nums[target_data['win_horse_jockey']]+=1
-            odds_5race_sum += float(target_data['win_horse_odds'])
-        odds_sum.append(odds_5race_sum)
         populuar_sum.append(sum(data['popular']))
     sorted_jockey_win_nums = sorted(jockey_win_nums.items(),  key = lambda item : item[1], reverse=True)
 
