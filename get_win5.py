@@ -3,7 +3,7 @@ import datetime
 import json
 from bs4 import BeautifulSoup
 from urllib import request
-RESULT_OUTPUT_PATH = './win5_result.json'
+RESULT_OUTPUT_PATH = './data/win5_result.json'
 
 def main():
     this_year = datetime.datetime.now().year

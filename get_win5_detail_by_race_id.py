@@ -3,8 +3,8 @@ import json
 import re
 from bs4 import BeautifulSoup
 from urllib import request
-RESULT_INPUT_PATH = './win5_result.json'
-RESULT_OUTPUT_PATH = './win5_result_detail.json'
+RESULT_INPUT_PATH = './data/win5_result.json'
+RESULT_OUTPUT_PATH = './data/win5_result_detail.json'
 def main():
     with open(RESULT_INPUT_PATH , 'r') as jsonf:
         result_json = json.load(jsonf)

@@ -5,9 +5,9 @@ import plotly.express as px
 from collections import defaultdict
 def main():
 
-    with open('/Users/suguru/work/keiba/trend/win5_result.json' , 'r') as jsonf:
+    with open('./data/win5_result.json' , 'r') as jsonf:
         result_json = json.load(jsonf)
-    with open('/Users/suguru/work/keiba/trend/win5_result_detail.json' , 'r') as jsonf:
+    with open('./data/win5_result_detail.json' , 'r') as jsonf:
         result_detail_json = json.load(jsonf)
       
     populuar_sum = []
@@ -49,7 +49,7 @@ def main():
         # plot_bgcolor='Black'
     )
     # fig.show()
-    output_path = './win5_jockey_win.json'
+    output_path = './fig/win5_jockey_win_plotly.json'
     # fig.write_html("./win5_jockey_win.html", full_html=False,include_plotlyjs=False)
     fig.write_json(output_path)
 
