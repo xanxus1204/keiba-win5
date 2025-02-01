@@ -1,22 +1,29 @@
 import re
 import datetime
 import json
+import sys, os,time
 from bs4 import BeautifulSoup
 from urllib import request
-RESULT_OUTPUT_PATH = './data/win5_result.json'
-
+RESULT_OUTPUT_DIR = './data/'
+HEADERS={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'}
 def main():
-    this_year = datetime.datetime.now().year
+    target_year = ''
+    if len(sys.argv) > 1:
+        target_year = sys.argv[1]
+    else:
+        target_year = datetime.datetime.now().year
     win5_url = 'https://race.netkeiba.com/top/win5_results.html?select=win5_results&year={}'.format(
-        this_year)
+        target_year)
     print('Start to get {}'.format(win5_url))
-    response = request.urlopen(win5_url)
+    get_req = request.Request(win5_url, headers=HEADERS)
+    response = request.urlopen(get_req)
     htmlsource = BeautifulSoup(response, 'html.parser')
     win5s = htmlsource.find_all(class_='WIN5_RaceListBox')
     win5s.reverse()
     res_list = []
     for win5 in win5s:
         # print(win5)
+        time.sleep(0.01)
         win5_info = str(win5.find(class_='Win5RaceName')).split('\n')
         if len(win5_info) > 1:
             date_pat = r'[0-9]{8}'
@@ -47,7 +54,11 @@ def main():
             win5_ninki = [int(ninki) for ninki in win5_ninki]
             #払い戻し
             win5_pay_back_html = str(win5.find(class_='Win5PlaybackMoney'))
-            refund_money = win5_pay_back_html[win5_pay_back_html.index('>')+1: win5_pay_back_html.index('</span>')]
+            if win5_pay_back_html != "None":
+                refund_money = win5_pay_back_html[win5_pay_back_html.index('>')+1: win5_pay_back_html.index('</span>')]
+            else:
+                refund_money = "0円" #キャリーオーバー
+            
 
             win5_dict = {"win5_id": win5_date,
                          "refund": refund_money,
@@ -65,16 +76,18 @@ def main():
             # print('{},{},{},{}'.format(win5_date, win5_title, win5_number,win5_ninki))
 
     res_dict = {"win5_data_list": res_list}
+    result_file_name = RESULT_OUTPUT_DIR + '{}/win5_result.json'.format(target_year)
     # json.dumps(res_dict)
-    with open(RESULT_OUTPUT_PATH, 'w') as json_file:
+    with open(result_file_name, 'w') as json_file:
         json.dump(res_dict, json_file)
-    print('Get win5 data done')
+    print('Get win5 data done {}'.format(result_file_name))
 
 
 def get_win5_detail(win5_race_id):
     target_url = 'https://race.netkeiba.com/top/win5.html?date=' + win5_race_id
     print('Start to ger data from ' + target_url)
-    response = request.urlopen(target_url)
+    get_req = request.Request(target_url, headers=HEADERS)
+    response = request.urlopen(get_req)
     htmlsource = BeautifulSoup(response, 'html.parser')
     win5_races = htmlsource.find_all(class_='win5raceresult2')
     win5_races = str(win5_races)

@@ -1,12 +1,19 @@
 import json
+import sys, os
 import plotly.graph_objects as go
 import plotly.express as px
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils')))
+from utils.json_reader import JSONFileHandler
 def main():
-
-    with open('./data/win5_result.json' , 'r') as jsonf:
-        result_json = json.load(jsonf)
-    with open('./data/win5_result_detail.json' , 'r') as jsonf:
-        result_detail_json = json.load(jsonf)
+    if len(sys.argv) < 2:
+        print('Need argument for target year')
+        exit(1)
+    target_year =  sys.argv[1]
+    target_dir = './data/' + target_year
+    result_json_handler = JSONFileHandler('{}/win5_result.json'.format(target_dir))
+    result_detail_json_handler = JSONFileHandler('{}/win5_result_detail.json'.format(target_dir))
+    result_json = result_json_handler.read_json()
+    result_detail_json = result_detail_json_handler.read_json()
       
     odds_sum = []
     refunds = []
@@ -21,7 +28,10 @@ def main():
             odds_5race_sum += float(target_data['win_horse_odds'])
         odds_sum.append(round(odds_5race_sum,1))
         refunds_kanji.append(refund)
-        refunds.append(kanji_yen_to_number(refund))
+        if refund == "0円":
+            refunds.append(1) #logを取るので特別扱い
+        else:
+            refunds.append(kanji_yen_to_number(refund))
 
     x = len(result_json['win5_data_list'])
     x_axis = [i for i  in range(1,x+1)]
@@ -63,7 +73,9 @@ def main():
     )
     # fig.update_yaxes(type='log')
     # fig.show()
-    output_path = './fig/win5_return_odds_sum.json'
+    output_dir = './fig/{}/'.format(target_year)
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = output_dir + 'win5_return_odds_sum.json'
     # fig.write_html("./win5_jockey_win.html", full_html=False,include_plotlyjs=False)
     fig.write_json(output_path)
 

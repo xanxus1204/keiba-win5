@@ -1,15 +1,23 @@
 import json
+import sys,os
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from collections import defaultdict
-def main():
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'utils')))
+from utils.json_reader import JSONFileHandler
 
-    with open('./data/win5_result.json' , 'r') as jsonf:
-        result_json = json.load(jsonf)
-    with open('./data/win5_result_detail.json' , 'r') as jsonf:
-        result_detail_json = json.load(jsonf)
-      
+def main():
+    if len(sys.argv) < 2:
+        print('Need argument for target year')
+        exit(1)
+    target_year =  sys.argv[1]
+    target_dir = './data/' + target_year
+    result_json_handler = JSONFileHandler('{}/win5_result.json'.format(target_dir))
+    result_detail_json_handler = JSONFileHandler('{}/win5_result_detail.json'.format(target_dir))
+    result_json = result_json_handler.read_json()
+    result_detail_json = result_detail_json_handler.read_json()
+    
     populuar_sum = []
     jockey_win_nums = defaultdict(int)
     for data in result_json['win5_data_list']:
@@ -23,8 +31,8 @@ def main():
 
     jockey_names = [i[0] for i in sorted_jockey_win_nums]
     jockey_wins = [i[1] for i in sorted_jockey_win_nums]
-
-    filtered_data = [(x_val, y_val) for x_val, y_val in zip(jockey_names,jockey_wins) if y_val > 1]
+    min_win_num = min(jockey_wins) if min(jockey_wins) > 1 else 0
+    filtered_data = [(x_val, y_val) for x_val, y_val in zip(jockey_names,jockey_wins) if y_val > min_win_num]
 
     # フィルタリングされたデータから新しいxとyを作成
     jockey_names_filterd, jockey_wins_filtered = zip(*filtered_data)
@@ -45,9 +53,12 @@ def main():
         # plot_bgcolor='Black'
     )
     # fig.show()
-    output_path = './fig/win5_jockey_win_plotly.json'
-    # fig.write_html("./win5_jockey_win.html", full_html=False,include_plotlyjs=False)
+    output_dir = './fig/{}/'.format(target_year)
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = output_dir + 'win5_jockey_win_plotly.json'
     fig.write_json(output_path)
+    # fig.write_html("./win5_jockey_win.html", full_html=False,include_plotlyjs=False)
+    
 
 
 
